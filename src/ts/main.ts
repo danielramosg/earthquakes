@@ -1,4 +1,9 @@
 import * as d3 from 'd3';
+console.log(d3); // This is a fix
+/**
+ * Import is somewhat broken in Parcel
+ * https://github.com/parcel-bundler/parcel/issues/8792
+ * */
 import { geoMollweide } from 'd3-geo-projection';
 // import * as topojson from 'topojson-client';
 
