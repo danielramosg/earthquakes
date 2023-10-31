@@ -1,0 +1,33 @@
+
+
+.sphere {
+    fill: none;
+    stroke: black;
+}
+
+.land {
+    fill:bisque;
+}
+
+.city {
+    fill: rgb(246, 108, 108);
+}
+
+.place-label {
+font-family: sans-serif;
+}
+
+.tectonic {
+    fill: none;
+    stroke: blue ;
+    stroke-width: 1px;
+    opacity: 0.5;
+}
+
+#hist1 {
+    margin: 0.5em;
+}
+
+.histBins {
+    fill: #69b3a2
+}

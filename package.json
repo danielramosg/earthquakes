@@ -1,0 +1,36 @@
+{
+  "name": "earthquakes",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.html",
+  "targets": {
+    "": {
+      "source": [
+        "src/html/index.html"
+      ],
+      "context": "browser",
+      "isLibrary": false,
+      "publicUrl": "."
+    }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "parcel serve --dist-dir dist-dev --target ''",
+    "build": "parcel build --target ''"
+  },
+  "author": "Daniel Ramos",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/d3": "^7.4.0",
+    "@types/d3-geo": "^3.0.6",
+    "@types/topojson-client": "^3.1.1",
+    "parcel": "^2.9.3",
+    "prettier": "^3.0.0"
+  },
+  "dependencies": {
+    "d3": "^7.8.5",
+    "d3-geo": "^3.1.0",
+    "d3-geo-projection": "^4.0.0",
+    "topojson-client": "^3.1.0"
+  }
+}

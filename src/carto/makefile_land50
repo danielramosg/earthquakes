@@ -1,0 +1,31 @@
+# Download and Transform the 1:50m Country Shapefiles from Natural Earth
+# http://www.naturalearthdata.com/downloads/50m-physical-vectors/
+
+URL = https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/50m/physical/ne_50m_land.zip
+
+# Goals
+all: land.geojson land.topojson clean
+
+# Download the zip file from the Natural Earth server
+ne_50m_land.zip:
+	curl -LO $(URL)
+
+# Unzip the shapefiles
+ne_50m_land.shp: ne_50m_land.zip
+	unzip ne_50m_land.zip
+	touch ne_50m_land.shp
+
+# Convert the shapefiles to GeoJSON
+land.geojson: ne_50m_land.shp
+#	ogr2ogr -f GeoJSON land.geojson ne_50m_land.shp
+	ogr2ogr -simplify 0.01 -f GeoJSON land.geojson ne_50m_land.shp
+#	ogr2ogr -simplify 0.999 -f GeoJSON land.geojson ne_50m_land.shp #more coarse
+#	ogr2ogr -simplify 0.5 -f GeoJSON land.geojson ne_50m_land.shp
+
+# Convert the GeoJSON file to TopoJSON
+land.topojson: land.geojson
+	topojson -p -o land.topojson land.geojson
+
+# Remove source and temporary files
+clean:
+	rm ne_50m_land*

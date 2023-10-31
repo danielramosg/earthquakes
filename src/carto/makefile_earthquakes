@@ -1,0 +1,59 @@
+
+# Cities with more than 1000 population
+# https://data.opendatasoft.com/explore/dataset/geonames-all-cities-with-a-population-1000%40public/export/?disjunctive.cou_name_en
+
+URL_countries = https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/50m/cultural/ne_50m_admin_0_countries.zip
+URL_cities = https://data.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000@public/exports/geojson?lang=en&timezone=Europe%2FBerlin
+URL_earthquakes = https://data.opendatasoft.com/api/explore/v2.1/catalog/datasets/significant-earthquake-database@public/exports/geojson?lang=en&timezone=Europe%2FBerlin
+URL_tectonic = https://github.com/fraxen/tectonicplates.git
+
+# Goals
+all: countries.geojson earthquakes.geojson tectonic.geojson clean #places.geojson #countries.topojson #clean
+
+# Downloads
+downloads/ne_50m_admin_0_countries.zip:
+	curl -L -o downloads/ne_50m_admin_0_countries.zip $(URL_countries)
+
+downloads/earthquakes.geojson:
+	curl -L -o downloads/earthquakes.geojson $(URL_earthquakes)
+
+downloads/tectonicplates:
+	cd downloads && git clone $(URL_tectonic)
+
+# Unzip the shapefiles
+ne_50m_admin_0_countries.shp: downloads/ne_50m_admin_0_countries.zip
+	unzip downloads/ne_50m_admin_0_countries.zip
+	touch ne_50m_admin_0_countries.shp
+
+earthquakes.geojson: downloads/earthquakes.geojson
+	cp downloads/earthquakes.geojson .
+	npx prettier -w earthquakes.geojson
+
+tectonic.geojson: downloads/tectonicplates
+	cp downloads/tectonicplates/GeoJSON/PB2002_boundaries.json ./tectonic.geojson
+
+
+# Convert the shapefiles to GeoJSON
+countries.geojson: ne_50m_admin_0_countries.shp
+	ogr2ogr -f GeoJSON -where "ADM0_A3 IN ('ESP')" countries.geojson ne_50m_admin_0_countries.shp
+
+# cities.geojson: downloads/cities-all.geojson
+# 	ogr2ogr cities.geojson -where \
+# 	"country_code = 'ES' AND \
+# 	(feature_code = 'PPLA' OR feature_code = 'PPLC') AND \
+# 	population > 300000" \
+# 	./downloads/cities-all.geojson
+
+# cities.geojson: downloads/cities-all.geojson
+# 	ogr2ogr cities.geojson -where "feature_code = 'PPLC'" ./downloads/cities-all.geojson
+
+
+
+
+# # Convert the GeoJSON file to TopoJSON
+# countries.topojson: countries.geojson
+# 	topojson -p -o countries.topojson countries.geojson
+
+# Remove source and temporary files
+clean:
+	rm ne_50m*

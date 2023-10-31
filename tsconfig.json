@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "strict": true,
+    "alwaysStrict": true,
+    "esModuleInterop": true,
+    "module": "es2022",
+    "moduleResolution": "node",
+    "typeRoots": ["types", "../../node_modules/@types"],
+    "lib": ["ES2021", "dom", "dom.iterable"],
+    "resolveJsonModule": true
+  }
+}
