@@ -63,18 +63,43 @@ async function main() {
     .classed('land', true);
 
   // Draw earthquakes
-  map1
-    .selectAll('.earthquake')
-    // .datum(topojson.feature(data, data.objects.land))
-    .data(earthquakes.features)
-    .enter()
-    .append('path')
-    .attr('d', path)
-    .classed('earthquake', true)
-    .style('fill', (d: any) => {
-      // console.log(d.properties.eq_primary);
-      return d.properties.eq_primary ? color(d.properties.eq_primary) : 'grey';
-    });
+  function drawEarthquakesTimeInterval(startYear: number, endYear: number) {
+    const data = earthquakes.features.filter(
+      (d) => d.properties.year >= startYear && d.properties.year < endYear,
+    );
+    console.log(data.length);
+
+    map1.selectAll('.earthquake').remove();
+    map1
+      .selectAll('.earthquake')
+      // .datum(topojson.feature(data, data.objects.land))
+      .data(data)
+      .enter()
+      .append('path')
+      .attr('d', path)
+      .classed('earthquake', true)
+      .style('fill', (d: any) => {
+        // console.log(d.properties.eq_primary);
+        return d.properties.eq_primary
+          ? color(d.properties.eq_primary)
+          : 'grey';
+      });
+  }
+
+  let year = -100;
+
+  let repeat = setInterval(() => {
+    drawEarthquakesTimeInterval(year, year + 5);
+    year += 5;
+    d3.select('#yearDisplay').html(`Years: ${year} to ${year + 5}`);
+
+    if (year > 2023) {
+      // year = -100;
+      clearInterval(repeat);
+      drawEarthquakesTimeInterval(-2000, 2050);
+      d3.select('#yearDisplay').html(`Years: all history`);
+    }
+  }, 200);
 
   //Draw tectonics
   map1.append('path').datum(tectonic).attr('d', path).classed('tectonic', true);
@@ -106,7 +131,7 @@ function makeHistogram(parent, width, height, data) {
     .value((d) => d.properties.eq_primary);
 
   const bins = bin(data.features);
-  console.log(bins);
+  // console.log(bins);
 
   hist1;
   var y = d3.scaleLinear().range([height, 0]);

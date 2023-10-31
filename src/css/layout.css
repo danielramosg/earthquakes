@@ -1,4 +1,19 @@
+body{
+    font-family: Arial, Helvetica, sans-serif;
+}
+
 #appContainer {
     display: flex;
     flex-wrap: wrap;
+}
+
+#map1{
+    position: relative;
+}
+
+#yearDisplay {
+    position: absolute;
+    bottom: 1em;
+    left: 1em;
+    font-size: large;
 }
