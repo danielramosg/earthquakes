@@ -44,6 +44,26 @@ async function main() {
     new URL('../carto/eqk.geojson', import.meta.url).href,
   ).then((data) => data.json());
 
+  const list = earthquakes.features.forEach((d) => {
+    d.properties.date = new Date(
+      Date.UTC(
+        d.properties.year,
+        d.properties.month - 1,
+        d.properties.day,
+        d.properties.hour,
+        d.properties.minute,
+        d.properties.second,
+        Math.floor(
+          (Number(d.properties.second) -
+            Math.floor(Number(d.properties.second))) *
+            1000,
+        ),
+      ),
+    );
+  });
+
+  window.earthquakes = earthquakes;
+
   const tectonic: JSON = await fetch(
     new URL('../carto/tectonic.geojson', import.meta.url).href,
   ).then((data) => data.json());
@@ -67,7 +87,7 @@ async function main() {
     const data = earthquakes.features.filter(
       (d) => d.properties.year >= startYear && d.properties.year < endYear,
     );
-    console.log(data.length);
+    // console.log(data.length);
 
     map1.selectAll('.earthquake').remove();
     map1
