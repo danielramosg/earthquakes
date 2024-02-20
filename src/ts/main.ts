@@ -63,18 +63,24 @@ async function main() {
   // Draw earthquakes
 
   let year = 1964;
+  let time = new Date(Date.UTC(1964, 0, 1)); // all dates and times in UTC
+  let deltaTime = 30 * 6 * 24 * 60 * 60 * 1000; // one day, in  milliseconds.
 
   let repeat = setInterval(() => {
-    drawEarthquakesTimeInterval(year, year + 1);
-    year += 1;
-    d3.select('#yearDisplay').html(`Years: ${year} to ${year + 1}`);
+    const newTime = new Date(time.getTime() + deltaTime);
+    drawEarthquakesTimeInterval(time, newTime);
 
-    if (year > 2023) {
+    d3.select('#timeDisplay').html(
+      `Dates: from ${time.toISOString()} to ${newTime.toISOString()}`,
+    );
+
+    if (time.getFullYear() > 2023) {
       // year = -100;
       clearInterval(repeat);
-      drawEarthquakesTimeInterval(-2000, 2050);
-      d3.select('#yearDisplay').html(`Years: all history`);
+      drawEarthquakesTimeInterval(new Date(1964, 0, 1), new Date());
+      d3.select('#timeDisplay').html(`All history`);
     }
+    time = newTime;
   }, 500);
 
   // Make histogram

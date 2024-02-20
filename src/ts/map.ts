@@ -38,11 +38,13 @@ function drawBaseMap(land, tectonic) {
   map1.append('path').datum(tectonic).attr('d', path).classed('tectonic', true);
 }
 
-function drawEarthquakesTimeInterval(startYear: number, endYear: number) {
+function drawEarthquakesTimeInterval(startDate: Date, endDate: Date) {
   const map1 = d3.select('#map1').select('svg');
 
   const data = earthquakes.features.filter(
-    (d) => d.properties.year >= startYear && d.properties.year < endYear,
+    (d) =>
+      d.properties.date.getTime() >= startDate.getTime() &&
+      d.properties.date.getTime() < endDate.getTime(),
   );
   // console.log(data.length);
 
