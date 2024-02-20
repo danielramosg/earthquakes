@@ -1,0 +1,11 @@
+
+
+# Goals
+all: eqk.geojson
+
+eqk.csv:
+	in2csv earthquakes_ISC-GEM_y_GCMT.xlsx > eqk.csv   
+
+eqk.geojson: eqk.csv
+	csvjson --lat "latitude" --lon "longitude" eqk.csv > eqk.geojson
+	npx prettier -w eqk.geojson

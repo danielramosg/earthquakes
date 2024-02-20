@@ -33,7 +33,7 @@ const projection = geoMollweide();
 
 const path = d3.geoPath(projection).pointRadius(2);
 
-const color = d3.scaleLinear().domain([2, 8]).range(['blue', 'red']);
+const color = d3.scaleLinear().domain([5.5, 9.5]).range(['blue', 'red']);
 
 async function main() {
   const land: JSON = await fetch(
@@ -41,7 +41,7 @@ async function main() {
   ).then((data) => data.json());
 
   const earthquakes: JSON = await fetch(
-    new URL('../carto/earthquakes.geojson', import.meta.url).href,
+    new URL('../carto/eqk.geojson', import.meta.url).href,
   ).then((data) => data.json());
 
   const tectonic: JSON = await fetch(
@@ -80,18 +80,16 @@ async function main() {
       .classed('earthquake', true)
       .style('fill', (d: any) => {
         // console.log(d.properties.eq_primary);
-        return d.properties.eq_primary
-          ? color(d.properties.eq_primary)
-          : 'grey';
+        return d.properties.magnitude ? color(d.properties.magnitude) : 'grey';
       });
   }
 
-  let year = -100;
+  let year = 1964;
 
   let repeat = setInterval(() => {
-    drawEarthquakesTimeInterval(year, year + 5);
-    year += 5;
-    d3.select('#yearDisplay').html(`Years: ${year} to ${year + 5}`);
+    drawEarthquakesTimeInterval(year, year + 1);
+    year += 1;
+    d3.select('#yearDisplay').html(`Years: ${year} to ${year + 1}`);
 
     if (year > 2023) {
       // year = -100;
@@ -99,7 +97,7 @@ async function main() {
       drawEarthquakesTimeInterval(-2000, 2050);
       d3.select('#yearDisplay').html(`Years: all history`);
     }
-  }, 200);
+  }, 500);
 
   //Draw tectonics
   map1.append('path').datum(tectonic).attr('d', path).classed('tectonic', true);
@@ -122,13 +120,13 @@ function makeHistogram(parent, width, height, data) {
 
   // Histogram intensity
 
-  const x = d3.scaleLinear().domain([0, 10]).range([0, width]);
+  const x = d3.scaleLinear().domain([5, 10]).range([0, width]);
 
   const bin = d3
     .bin()
     .domain(x.domain() as [number, number])
     .thresholds(x.ticks(60))
-    .value((d) => d.properties.eq_primary);
+    .value((d) => d.properties.magnitude);
 
   const bins = bin(data.features);
   // console.log(bins);
