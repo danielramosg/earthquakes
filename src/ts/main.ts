@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
-import { drawBaseMap, drawEarthquakesTimeInterval } from './map';
-import { makeHistogram } from './histogram';
+import { drawBaseMap, drawEarthquakes } from './map';
+import { Histogram, makeHistogram } from './histogram';
 
 console.log(d3); // This is a fix
 /**
@@ -62,13 +62,30 @@ async function main() {
   drawBaseMap(land, tectonic);
   // Draw earthquakes
 
-  let year = 1964;
-  let time = new Date(Date.UTC(1964, 0, 1)); // all dates and times in UTC
-  let deltaTime = 30 * 6 * 24 * 60 * 60 * 1000; // one day, in  milliseconds.
+  const hist = new Histogram(
+    document.getElementById('hist1') as HTMLElement,
+    600,
+    400,
+  );
+
+  const startTime = new Date(Date.UTC(1964, 0, 1)); // all dates and times in UTC
+  const deltaTime = 30 * 24 * 60 * 60 * 1000; // one day, in  milliseconds.
+  let time = startTime;
 
   let repeat = setInterval(() => {
     const newTime = new Date(time.getTime() + deltaTime);
-    drawEarthquakesTimeInterval(time, newTime);
+
+    const data = earthquakes.features.filter(
+      (d) =>
+        d.properties.date.getTime() >= startTime.getTime() &&
+        d.properties.date.getTime() < newTime.getTime(),
+    );
+    // console.log(data.length);
+
+    drawEarthquakes(data);
+
+    // Make histogram
+    hist.draw(data);
 
     d3.select('#timeDisplay').html(
       `Dates: from ${time.toISOString()} to ${newTime.toISOString()}`,
@@ -81,10 +98,7 @@ async function main() {
       d3.select('#timeDisplay').html(`All history`);
     }
     time = newTime;
-  }, 500);
-
-  // Make histogram
-  makeHistogram(document.getElementById('hist1'), 600, 400, earthquakes);
+  }, 50);
 }
 
 main();
