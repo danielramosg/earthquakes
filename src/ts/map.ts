@@ -1,12 +1,7 @@
 import * as d3 from 'd3';
-import { geoMollweide } from 'd3-geo-projection';
 
-const width = 1000;
-const height = 500;
-
-const projection = geoMollweide();
-
-const path = d3.geoPath(projection);
+const width = 800;
+const height = 400;
 
 const color = d3
   .scalePow()
@@ -16,9 +11,11 @@ const color = d3
 
 const magScale = d3.scaleSqrt().domain([5, 10]).range([2, 20]);
 
-function drawBaseMap(land, tectonic) {
+function drawBaseMap(id, projection, land, tectonic) {
+  const path = d3.geoPath(projection);
+  d3.select(`#${id}`).select('svg').remove();
   const map1 = d3
-    .select('#map1')
+    .select(`#${id}`)
     .append('svg')
     .attr('width', width)
     .attr('height', height);
@@ -72,11 +69,12 @@ function drawBaseMap(land, tectonic) {
   map1.append('path').datum(tectonic).attr('d', path).classed('tectonic', true);
 }
 
-function drawEarthquakes(data) {
-  const map1 = d3.select('#map1').select('svg');
+function drawEarthquakes(id, projection, data) {
+  const path = d3.geoPath(projection);
+  const map = d3.select(`#${id}`).select('svg');
 
-  //   map1.selectAll('.earthquake').style('fill', 'url(#gradient)');
-  map1
+  //   map.selectAll('.earthquake').style('fill', 'url(#gradient)');
+  map
     .selectAll('.earthquake')
     // .datum(topojson.feature(data, data.objects.land))
     .data(data)
@@ -88,6 +86,7 @@ function drawEarthquakes(data) {
     )
     .classed('earthquake', true)
     .style('fill', 'url(#gradient)');
+
   // .style('fill', (d: any) => {
   //   // console.log(d.properties.eq_primary);
   //   return d.properties.magnitude ? color(d.properties.magnitude) : 'grey';

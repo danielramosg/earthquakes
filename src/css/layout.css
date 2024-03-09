@@ -7,13 +7,14 @@ body {
   flex-wrap: wrap;
 }
 
-#map1 {
+#map1,
+#map2 {
   position: relative;
 }
 
 #timeDisplay {
   position: absolute;
-  bottom: 1em;
+  top: 1em;
   left: 1em;
   font-size: large;
 }

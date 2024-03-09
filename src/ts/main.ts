@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 import { drawBaseMap, drawEarthquakes } from './map';
 import { Histogram, makeHistogram } from './histogram';
+import { geoMollweide } from 'd3-geo-projection';
 
 console.log(d3); // This is a fix
 /**
@@ -8,8 +9,10 @@ console.log(d3); // This is a fix
  * https://github.com/parcel-bundler/parcel/issues/8792
  * */
 
-import { geoMollweide } from 'd3-geo-projection';
-// import * as topojson from 'topojson-client';
+const projection1 = geoMollweide().scale(100).rotate([-40, 0]);
+const projection2 = d3.geoOrthographic().scale(150);
+const vx = 0.01;
+const vy = -0.01;
 
 // const projection = d3
 //   .geoConicConformal()
@@ -59,7 +62,6 @@ async function main() {
 
   window.earthquakes = earthquakes;
 
-  drawBaseMap(land, tectonic);
   // Draw earthquakes
 
   const hist = new Histogram(
@@ -73,6 +75,12 @@ async function main() {
   let time = startTime;
 
   let repeat = setInterval(() => {
+    const t = performance.now();
+    projection2.rotate([vx * t, vy * t]);
+
+    drawBaseMap('map1', projection1, land, tectonic);
+    // drawBaseMap('map2', projection2, land, tectonic);
+
     const newTime = new Date(time.getTime() + deltaTime);
 
     const data = earthquakes.features.filter(
@@ -82,20 +90,20 @@ async function main() {
     );
     // console.log(data.length);
 
-    drawEarthquakes(data);
+    drawEarthquakes('map1', projection1, data);
+    // drawEarthquakes('map2', projection2, data);
 
     // Make histogram
     hist.draw(data);
 
     d3.select('#timeDisplay').html(
-      `Dates: from ${time.toISOString()} to ${newTime.toISOString()}`,
+      `Dates: from ${startTime.toDateString()} to ${newTime.toDateString()}`,
     );
 
     if (time.getFullYear() > 2023) {
       // year = -100;
       clearInterval(repeat);
-      drawEarthquakesTimeInterval(new Date(1964, 0, 1), new Date());
-      d3.select('#timeDisplay').html(`All history`);
+      d3.select('#timeDisplay').html(`1964-2023`);
     }
     time = newTime;
   }, 50);
