@@ -24,7 +24,7 @@ class Histogram implements Histogram {
       .attr('transform', `translate(${hist_margin},${hist_margin})`);
 
     this.x = d3.scaleLinear().domain([6, 10]).range([0, width]);
-    this.y = d3.scaleLinear().domain([0, 6000]).range([height, 0]);
+    this.y = d3.scaleLinear().domain([0, 2500]).range([height, 0]);
 
     // y.domain([0, d3.max(bins, (d) => d.length)]);
 

@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 import { Map } from './map';
 import { Histogram, makeHistogram } from './histogram';
 import { geoMollweide } from 'd3-geo-projection';
+import { Timeline } from './timeline';
 
 console.log(d3); // This is a fix
 /**
@@ -31,7 +32,7 @@ const startTime = new Date(Date.UTC(1964, 0, 1)); // all dates and times in UTC
 const endTime = new Date(Date.UTC(2023, 11, 31));
 const deltaTime = 30 * 24 * 60 * 60 * 1000; // one day, in  milliseconds.
 
-const animationDuration = 480000; // 30 sec
+const animationDuration = 30000; // 30 sec
 
 const startTimeNum = startTime.getTime();
 const endTimeNum = endTime.getTime();
@@ -39,6 +40,11 @@ const endTimeNum = endTime.getTime();
 const date2timeStamp = (date: Date) =>
   ((date.getTime() - startTimeNum) / (endTimeNum - startTimeNum)) *
   animationDuration;
+
+const timeStamp2date = (t: number) =>
+  new Date(
+    (t / animationDuration) * (endTimeNum - startTimeNum) + startTimeNum,
+  );
 
 async function main() {
   // Fetch data
@@ -61,7 +67,7 @@ async function main() {
     const newDate = new Date(
       Date.UTC(
         d.properties.year,
-        d.properties.month - 1,
+        (Number(d.properties.month) - 1).toString(),
         d.properties.day,
         d.properties.hour,
         d.properties.minute,
@@ -73,13 +79,25 @@ async function main() {
         ),
       ),
     );
+
     d.properties.date = newDate as Date;
     d.properties.timeStamp = date2timeStamp(newDate);
+    if (d.properties.timeStamp === NaN) {
+      console.log(d);
+    }
   });
 
   window.earthquakes = earthquakes;
 
   // Draw earthquakes
+
+  const timeline = new Timeline(
+    document.getElementById('timeline') as HTMLElement,
+    1000,
+    100,
+    startTime,
+    endTime,
+  );
 
   const hist = new Histogram(
     document.getElementById('hist1') as HTMLElement,
@@ -104,6 +122,7 @@ async function main() {
   const animate = (t: number) => {
     map1.drawEarthquakesExploding(t, earthquakes);
     hist.drawTimestamp(t, earthquakes);
+    timeline.setHead(timeStamp2date(t));
 
     requestAnimationFrame((t) => animate(t));
   };
