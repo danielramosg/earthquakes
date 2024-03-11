@@ -9,7 +9,7 @@ console.log(d3); // This is a fix
  * https://github.com/parcel-bundler/parcel/issues/8792
  * */
 
-const projection1 = geoMollweide().scale(100).rotate([-40, 0]);
+const projection1 = geoMollweide().scale(150).rotate([-40, 0]);
 const projection2 = d3.geoOrthographic().scale(150);
 const vx = 0.01;
 const vy = -0.01;
@@ -91,24 +91,19 @@ async function main() {
 
   const map1 = new Map(
     document.getElementById('map1') as HTMLElement,
-    600,
-    400,
+    1000,
+    500,
     projection1,
   );
 
   map1.drawBaseMap(land, tectonic);
-  map1.drawEarthquakes(earthquakes);
+  // map1.drawEarthquakes(earthquakes);
   // map1.drawEarthquakesExploding(10000, earthquakes);
   // map1.drawEarthquakesExploding(40000, earthquakes);
 
-  // setInterval(
-  //   () => map1.drawEarthquakesExploding(performance.now(), earthquakes),
-  //   20,
-  // );
-
-  const animate = (t) => {
-    // map1.drawEarthquakes(earthquakes);
+  const animate = (t: number) => {
     map1.drawEarthquakesExploding(t, earthquakes);
+    hist.drawTimestamp(t, earthquakes);
 
     requestAnimationFrame((t) => animate(t));
   };

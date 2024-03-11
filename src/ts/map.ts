@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 
-const width = 800;
-const height = 400;
+const width = 1000;
+const height = 500;
 
 const explosionDuration = 1000;
 
@@ -16,9 +16,15 @@ const easing = (t: number) => d3.easeQuadInOut(t);
 
 interface Map {
   projection: d3.GeoProjection;
-  baseLayer: HTMLCanvasElement;
-  eqkAccuLayer: HTMLCanvasElement;
-  eqkLayer: HTMLCanvasElement;
+  cnvBase: HTMLCanvasElement; // base layer: land, tectonic plaques
+  cnvAccu: HTMLCanvasElement; // accumulated earthquakes
+  cnvExp: HTMLCanvasElement; // exploding earthquakes
+  ctxBase: CanvasRenderingContext2D;
+  ctxAccu: CanvasRenderingContext2D;
+  ctxExp: CanvasRenderingContext2D;
+  pathBase: d3.GeoPath;
+  pathAccu: d3.GeoPath;
+  pathExp: d3.GeoPath;
   width: number;
   height: number;
   drawBaseMap(
@@ -43,7 +49,7 @@ class Map implements Map {
 
     d3.select(parent).classed('map', true);
 
-    this.baseLayer = d3
+    this.cnvBase = d3
       .select(parent)
       .append('canvas')
       //   .classed('mapLayer', true)
@@ -51,7 +57,9 @@ class Map implements Map {
       .attr('height', height)
       .node() as HTMLCanvasElement;
 
-    this.eqkAccuLayer = d3
+    this.ctxBase = this.cnvBase.getContext('2d') as CanvasRenderingContext2D;
+
+    this.cnvAccu = d3
       .select(parent)
       .append('canvas')
       .classed('mapLayer', true)
@@ -59,77 +67,85 @@ class Map implements Map {
       .attr('height', height)
       .node() as HTMLCanvasElement;
 
-    this.eqkLayer = d3
+    this.ctxAccu = this.cnvAccu.getContext('2d') as CanvasRenderingContext2D;
+
+    this.cnvExp = d3
       .select(parent)
       .append('canvas')
       .classed('mapLayer', true)
       .attr('width', width)
       .attr('height', height)
       .node() as HTMLCanvasElement;
+
+    this.ctxExp = this.cnvExp.getContext('2d') as CanvasRenderingContext2D;
+
+    this.pathBase = d3.geoPath(this.projection, this.ctxBase);
+    this.pathAccu = d3.geoPath(this.projection, this.ctxAccu);
+    this.pathExp = d3.geoPath(this.projection, this.ctxExp);
   }
 
   drawBaseMap(
     land: GeoJSON.FeatureCollection,
     tectonic: GeoJSON.FeatureCollection,
   ) {
-    const cnv = this.baseLayer;
-    const ctx = cnv.getContext('2d') as CanvasRenderingContext2D;
+    this.ctxBase.beginPath();
+    this.pathBase(land);
+    this.ctxBase.fill();
 
-    const path = d3.geoPath(this.projection, ctx);
+    this.ctxBase.strokeStyle = 'blue';
+    this.ctxBase.beginPath();
+    this.pathBase(tectonic);
+    this.ctxBase.stroke();
 
-    ctx.beginPath();
-    path(land);
-    ctx.fill();
-
-    ctx.strokeStyle = 'blue';
-    ctx.beginPath();
-    path(tectonic);
-    ctx.stroke();
-
-    ctx.strokeStyle = 'black';
-    ctx.beginPath();
-    path({ type: 'Sphere' });
-    ctx.stroke();
+    this.ctxBase.strokeStyle = 'black';
+    this.ctxBase.beginPath();
+    this.pathBase({ type: 'Sphere' });
+    this.ctxBase.stroke();
   }
 
   drawEarthquakes(data: GeoJSON.FeatureCollection) {
-    const cnv = this.eqkAccuLayer;
-    const ctx = cnv.getContext('2d') as CanvasRenderingContext2D;
+    this.pathAccu.pointRadius((d) => magScale(Number(d.properties.magnitude)));
 
-    const path = d3
-      .geoPath(this.projection, ctx)
-      .pointRadius((d) => magScale(Number(d.properties.magnitude)) * 0.3);
+    this.ctxAccu.fillStyle = 'rgba(255, 0, 0, 1)';
+    this.ctxAccu.filter = 'blur(3px)';
 
-    ctx.fillStyle = 'rgba(255, 0, 0, 1)';
-    ctx.filter = 'blur(3px)';
-
-    ctx?.beginPath();
-    data.features.forEach((d) => path(d));
-    ctx?.fill();
+    this.ctxAccu?.beginPath();
+    data.features.forEach((d) => this.pathAccu(d));
+    this.ctxAccu?.fill();
   }
 
   drawEarthquakesExploding(timestamp: number, data: GeoJSON.FeatureCollection) {
-    const cnv = this.eqkLayer;
-    const ctx = cnv.getContext('2d') as CanvasRenderingContext2D;
+    this.ctxExp.clearRect(0, 0, this.width, this.height);
 
-    ctx?.clearRect(0, 0, this.width, this.height);
-    const path = d3.geoPath(this.projection, ctx).pointRadius((d) => {
+    this.ctxExp.strokeStyle = 'yellow';
+
+    this.ctxAccu.fillStyle = 'rgba(0, 255, 255, 1)';
+    this.ctxAccu.filter = 'blur(6px) opacity(30%)';
+    // this.ctxAccu.filter = 'opacity(30%)';
+
+    this.ctxExp.beginPath();
+    this.ctxAccu.beginPath();
+
+    data.features.forEach((d) => {
       const time = (timestamp - d.properties.timeStamp) / explosionDuration;
 
       if (time > 0 && time < 1) {
-        // ctx.filter = `opacity(${(1 - easing(time)) * 100}%)`;
-        // return 4;
-        return easing(time) * magScale(Number(d.properties.magnitude));
-      } else {
-        return 0;
+        this.pathExp.pointRadius(
+          easing(time) * magScale(Number(d.properties.magnitude)),
+        );
+        this.pathExp(d);
+      }
+
+      if (Math.abs(time) < 1e-2) {
+        this.pathAccu.pointRadius(
+          magScale(Number(d.properties.magnitude)) * 0.3,
+        );
+        this.pathAccu(d);
       }
     });
 
-    ctx.strokeStyle = 'rgba(0, 255, 255, 1)';
-
-    ctx.beginPath();
-    data.features.forEach((d) => path(d));
-    ctx.stroke();
+    this.ctxExp.stroke();
+    this.ctxAccu.fill();
   }
 }
 

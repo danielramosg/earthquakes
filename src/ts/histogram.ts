@@ -7,6 +7,7 @@ interface Histogram {
   x: any;
   y: any;
   draw(data: GeoJSON.FeatureCollection): void;
+  drawTimestamp(timestamp: number, data: GeoJSON.FeatureCollection): void;
 }
 
 class Histogram implements Histogram {
@@ -22,7 +23,7 @@ class Histogram implements Histogram {
       .append('g')
       .attr('transform', `translate(${hist_margin},${hist_margin})`);
 
-    this.x = d3.scaleLinear().domain([5.5, 10]).range([0, width]);
+    this.x = d3.scaleLinear().domain([6, 10]).range([0, width]);
     this.y = d3.scaleLinear().domain([0, 6000]).range([height, 0]);
 
     // y.domain([0, d3.max(bins, (d) => d.length)]);
@@ -53,6 +54,40 @@ class Histogram implements Histogram {
       .data(bins)
       .enter()
       .append('rect')
+      .attr('x', 1)
+      .attr(
+        'transform',
+        (d: d3.Bin<any, any>) =>
+          `translate(${this.x(d.x0)},${this.y(d.length)})`,
+      )
+      .attr('width', (d: d3.Bin<any, any>) =>
+        Math.max(this.x(d.x1) - this.x(d.x0) - 1, 0),
+      )
+      .attr('height', (d: d3.Bin<any, any>) => this.height - this.y(d.length))
+      .classed('histBins', true);
+  }
+
+  drawTimestamp(timestamp: number, data: GeoJSON.FeatureCollection) {
+    // Histogram intensity
+
+    const useData = data.features.filter(
+      (d) => d.properties.timeStamp <= timestamp,
+    );
+
+    this.hist.selectAll('.histBins').remove();
+
+    const bin = d3
+      .bin()
+      .domain(this.x.domain() as [number, number])
+      .thresholds(this.x.ticks(55))
+      .value((d) => d.properties.magnitude);
+
+    const bins = bin(useData);
+
+    this.hist
+      .selectAll('.histBins')
+      .data(bins)
+      .join('rect')
       .attr('x', 1)
       .attr(
         'transform',
