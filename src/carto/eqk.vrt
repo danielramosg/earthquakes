@@ -1,6 +1,6 @@
 <OGRVRTDataSource>
-    <OGRVRTLayer name="test">
-        <SrcDataSource>data.csv</SrcDataSource>
+    <OGRVRTLayer name="eqk">
+        <SrcDataSource>eqk.csv</SrcDataSource>
         <GeometryType>wkbPoint</GeometryType>
         <LayerSRS>WGS84</LayerSRS>
         <GeometryField encoding="PointFromColumns" x="longitude" y="latitude"/>

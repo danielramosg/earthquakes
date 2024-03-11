@@ -7,5 +7,5 @@ eqk.csv:
 	in2csv earthquakes_v3.xlsx > eqk.csv   
 
 eqk.geojson: eqk.csv
-	csvjson --lat "latitude" --lon "longitude" eqk.csv > eqk.geojson
+	ogr2ogr -f geojson eqk.geojson eqk.vrt
 	npx prettier -w eqk.geojson
