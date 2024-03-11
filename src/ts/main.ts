@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { drawBaseMap, drawEarthquakes } from './map';
+import { Map } from './map';
 import { Histogram, makeHistogram } from './histogram';
 import { geoMollweide } from 'd3-geo-projection';
 
@@ -27,23 +27,38 @@ const vy = -0.01;
 //   ])
 //   .precision(0.2);
 
+const startTime = new Date(Date.UTC(1964, 0, 1)); // all dates and times in UTC
+const endTime = new Date(Date.UTC(2023, 11, 31));
+const deltaTime = 30 * 24 * 60 * 60 * 1000; // one day, in  milliseconds.
+
+const animationDuration = 480000; // 30 sec
+
+const startTimeNum = startTime.getTime();
+const endTimeNum = endTime.getTime();
+
+const date2timeStamp = (date: Date) =>
+  ((date.getTime() - startTimeNum) / (endTimeNum - startTimeNum)) *
+  animationDuration;
+
 async function main() {
   // Fetch data
-  const land: JSON = await fetch(
+  const land: GeoJSON.FeatureCollection = await fetch(
     new URL('../carto/land.geojson', import.meta.url).href,
   ).then((data) => data.json());
 
-  const earthquakes: JSON = await fetch(
+  const earthquakes: GeoJSON.FeatureCollection = await fetch(
     new URL('../carto/eqk.geojson', import.meta.url).href,
   ).then((data) => data.json());
 
-  const tectonic: JSON = await fetch(
+  const tectonic: GeoJSON.FeatureCollection = await fetch(
     new URL('../carto/tectonic.geojson', import.meta.url).href,
   ).then((data) => data.json());
 
+  console.log(`Loaded ${earthquakes.features.length} data points.`);
+
   // Add timestamps to earthquakes
   const list = earthquakes.features.forEach((d) => {
-    d.properties.date = new Date(
+    const newDate = new Date(
       Date.UTC(
         d.properties.year,
         d.properties.month - 1,
@@ -58,6 +73,8 @@ async function main() {
         ),
       ),
     );
+    d.properties.date = newDate as Date;
+    d.properties.timeStamp = date2timeStamp(newDate);
   });
 
   window.earthquakes = earthquakes;
@@ -70,43 +87,66 @@ async function main() {
     400,
   );
 
-  const startTime = new Date(Date.UTC(1964, 0, 1)); // all dates and times in UTC
-  const deltaTime = 30 * 24 * 60 * 60 * 1000; // one day, in  milliseconds.
   let time = startTime;
 
-  let repeat = setInterval(() => {
-    const t = performance.now();
-    projection2.rotate([vx * t, vy * t]);
+  const map1 = new Map(
+    document.getElementById('map1') as HTMLElement,
+    600,
+    400,
+    projection1,
+  );
 
-    drawBaseMap('map1', projection1, land, tectonic);
-    // drawBaseMap('map2', projection2, land, tectonic);
+  map1.drawBaseMap(land, tectonic);
+  map1.drawEarthquakes(earthquakes);
+  // map1.drawEarthquakesExploding(10000, earthquakes);
+  // map1.drawEarthquakesExploding(40000, earthquakes);
 
-    const newTime = new Date(time.getTime() + deltaTime);
+  // setInterval(
+  //   () => map1.drawEarthquakesExploding(performance.now(), earthquakes),
+  //   20,
+  // );
 
-    const data = earthquakes.features.filter(
-      (d) =>
-        d.properties.date.getTime() >= startTime.getTime() &&
-        d.properties.date.getTime() < newTime.getTime(),
-    );
-    // console.log(data.length);
+  const animate = (t) => {
+    // map1.drawEarthquakes(earthquakes);
+    map1.drawEarthquakesExploding(t, earthquakes);
 
-    drawEarthquakes('map1', projection1, data);
-    // drawEarthquakes('map2', projection2, data);
+    requestAnimationFrame((t) => animate(t));
+  };
+  requestAnimationFrame(animate);
 
-    // Make histogram
-    hist.draw(data);
+  // let repeat = setInterval(() => {
+  //   const t = performance.now();
+  //   projection2.rotate([vx * t, vy * t]);
 
-    d3.select('#timeDisplay').html(
-      `Dates: from ${startTime.toDateString()} to ${newTime.toDateString()}`,
-    );
+  //   map1.drawBaseMap(projection1, land, tectonic);
+  //   // drawBaseMap('map2', projection2, land, tectonic);
 
-    if (time.getFullYear() > 2023) {
-      // year = -100;
-      clearInterval(repeat);
-      d3.select('#timeDisplay').html(`1964-2023`);
-    }
-    time = newTime;
-  }, 50);
+  //   const newTime = new Date(time.getTime() + deltaTime);
+
+  //   const data = earthquakes.features.filter(
+  //     (d) =>
+  //       d.properties.date.getTime() >= startTime.getTime() &&
+  //       d.properties.date.getTime() < newTime.getTime(),
+  //   );
+  //   // console.log(data.length);
+
+  //   drawEarthquakes('map1', projection1, data);
+  //   // drawEarthquakes('map2', projection2, data);
+
+  //   // Make histogram
+  //   hist.draw(data);
+
+  //   d3.select('#timeDisplay').html(
+  //     `Dates: from ${startTime.toDateString()} to ${newTime.toDateString()}`,
+  //   );
+
+  //   if (time.getFullYear() > 2023) {
+  //     // year = -100;
+  //     clearInterval(repeat);
+  //     d3.select('#timeDisplay').html(`1964-2023`);
+  //   }
+  //   time = newTime;
+  // }, 50);
 }
 
 main();

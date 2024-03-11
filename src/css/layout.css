@@ -7,6 +7,15 @@ body {
   flex-wrap: wrap;
 }
 
+/* .map {
+  position: relative;
+} */
+.mapLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 #map1,
 #map2 {
   position: relative;
