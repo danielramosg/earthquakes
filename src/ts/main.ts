@@ -3,6 +3,7 @@ import { Map } from './map';
 import { Histogram, makeHistogram } from './histogram';
 import { geoMollweide } from 'd3-geo-projection';
 import { Timeline } from './timeline';
+import { Gallery } from './gallery';
 
 console.log(d3); // This is a fix
 /**
@@ -82,9 +83,6 @@ async function main() {
 
     d.properties.date = newDate as Date;
     d.properties.timeStamp = date2timeStamp(newDate);
-    if (d.properties.timeStamp === NaN) {
-      console.log(d);
-    }
   });
 
   window.earthquakes = earthquakes;
@@ -103,6 +101,17 @@ async function main() {
     document.getElementById('hist1') as HTMLElement,
     600,
     400,
+  );
+
+  const gallery = new Gallery(
+    document.getElementById('gallery') as HTMLElement,
+    600,
+    400,
+  );
+
+  gallery.setImages(
+    0,
+    earthquakes.features.filter((d) => d.properties.notable),
   );
 
   let time = startTime;
