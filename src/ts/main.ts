@@ -109,10 +109,7 @@ async function main() {
     400,
   );
 
-  gallery.setImages(
-    0,
-    earthquakes.features.filter((d) => d.properties.notable),
-  );
+  // gallery.setImages(earthquakes.features.filter((d) => d.properties.notable));
 
   let time = startTime;
 
@@ -132,6 +129,7 @@ async function main() {
     map1.drawEarthquakesExploding(t, earthquakes);
     hist.drawTimestamp(t, earthquakes);
     timeline.setHead(timeStamp2date(t));
+    gallery.setImagesTimestamp(t, earthquakes);
 
     requestAnimationFrame((t) => animate(t));
   };
