@@ -58,6 +58,10 @@ class Gallery implements Gallery {
     );
     this.setImages(filteredData);
   }
+
+  clearImages() {
+    this.gallery.selectAll('.galleryItem').remove();
+  }
 }
 
 export { Gallery };

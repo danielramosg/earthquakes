@@ -34,6 +34,7 @@ const endTime = new Date(Date.UTC(2023, 11, 31));
 const deltaTime = 30 * 24 * 60 * 60 * 1000; // one day, in  milliseconds.
 
 const animationDuration = 30000; // 30 sec
+const animationEndTime = 40000;
 
 const startTimeNum = startTime.getTime();
 const endTimeNum = endTime.getTime();
@@ -111,8 +112,6 @@ async function main() {
 
   // gallery.setImages(earthquakes.features.filter((d) => d.properties.notable));
 
-  let time = startTime;
-
   const map1 = new Map(
     document.getElementById('map1') as HTMLElement,
     1000,
@@ -125,15 +124,37 @@ async function main() {
   // map1.drawEarthquakesExploding(10000, earthquakes);
   // map1.drawEarthquakesExploding(40000, earthquakes);
 
-  const animate = (t: number) => {
+  let zero: number;
+
+  const startAnimation = (time: number) => {
+    zero = time;
+
+    map1.clearAccu();
+    map1.clearExp();
+    map1.clearNot();
+    gallery.clearImages();
+
+    animate(time);
+  };
+
+  const animate = (time: number) => {
+    const t = time - zero;
+
     map1.drawEarthquakesExploding(t, earthquakes);
     hist.drawTimestamp(t, earthquakes);
-    timeline.setHead(timeStamp2date(t));
+    if (t < animationDuration) {
+      timeline.setHead(timeStamp2date(t));
+    }
     gallery.setImagesTimestamp(t, earthquakes);
 
-    requestAnimationFrame((t) => animate(t));
+    if (t < animationEndTime) {
+      requestAnimationFrame((t) => animate(t));
+    } else {
+      requestAnimationFrame((t) => startAnimation(t));
+    }
   };
-  requestAnimationFrame(animate);
+
+  requestAnimationFrame(startAnimation);
 
   // let repeat = setInterval(() => {
   //   const t = performance.now();

@@ -169,6 +169,19 @@ class Map implements Map {
     this.ctxAccu.fill();
     this.ctxNot.fill();
   }
+
+  clearBase() {
+    this.ctxBase.clearRect(0, 0, this.width, this.height);
+  }
+  clearExp() {
+    this.ctxExp.clearRect(0, 0, this.width, this.height);
+  }
+  clearAccu() {
+    this.ctxAccu.clearRect(0, 0, this.width, this.height);
+  }
+  clearNot() {
+    this.ctxNot.clearRect(0, 0, this.width, this.height);
+  }
 }
 
 export { Map };
