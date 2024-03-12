@@ -11,7 +11,7 @@ console.log(d3); // This is a fix
  * https://github.com/parcel-bundler/parcel/issues/8792
  * */
 
-const projection1 = geoMollweide().scale(150).rotate([-40, 0]);
+const projection1 = geoMollweide().scale(160).rotate([-40, 0]);
 const projection2 = d3.geoOrthographic().scale(150);
 const vx = 0.01;
 const vy = -0.01;
@@ -88,11 +88,11 @@ async function main() {
 
   window.earthquakes = earthquakes;
 
-  // Draw earthquakes
+  // Initialize Elements
 
   const timeline = new Timeline(
     document.getElementById('timeline') as HTMLElement,
-    1000,
+    window.innerWidth,
     100,
     startTime,
     endTime,
@@ -100,17 +100,15 @@ async function main() {
 
   const hist = new Histogram(
     document.getElementById('hist1') as HTMLElement,
-    600,
     400,
+    300,
   );
 
   const gallery = new Gallery(
     document.getElementById('gallery') as HTMLElement,
-    600,
-    400,
+    800,
+    1000,
   );
-
-  // gallery.setImages(earthquakes.features.filter((d) => d.properties.notable));
 
   const map1 = new Map(
     document.getElementById('map1') as HTMLElement,
@@ -120,9 +118,6 @@ async function main() {
   );
 
   map1.drawBaseMap(land, tectonic);
-  // map1.drawEarthquakes(earthquakes);
-  // map1.drawEarthquakesExploding(10000, earthquakes);
-  // map1.drawEarthquakesExploding(40000, earthquakes);
 
   let zero: number;
 
@@ -155,55 +150,6 @@ async function main() {
   };
 
   requestAnimationFrame(startAnimation);
-
-  // let repeat = setInterval(() => {
-  //   const t = performance.now();
-  //   projection2.rotate([vx * t, vy * t]);
-
-  //   map1.drawBaseMap(projection1, land, tectonic);
-  //   // drawBaseMap('map2', projection2, land, tectonic);
-
-  //   const newTime = new Date(time.getTime() + deltaTime);
-
-  //   const data = earthquakes.features.filter(
-  //     (d) =>
-  //       d.properties.date.getTime() >= startTime.getTime() &&
-  //       d.properties.date.getTime() < newTime.getTime(),
-  //   );
-  //   // console.log(data.length);
-
-  //   drawEarthquakes('map1', projection1, data);
-  //   // drawEarthquakes('map2', projection2, data);
-
-  //   // Make histogram
-  //   hist.draw(data);
-
-  //   d3.select('#timeDisplay').html(
-  //     `Dates: from ${startTime.toDateString()} to ${newTime.toDateString()}`,
-  //   );
-
-  //   if (time.getFullYear() > 2023) {
-  //     // year = -100;
-  //     clearInterval(repeat);
-  //     d3.select('#timeDisplay').html(`1964-2023`);
-  //   }
-  //   time = newTime;
-  // }, 50);
 }
 
 main();
-
-// map1
-//   .selectAll('.place-label')
-//   .data(data.features)
-//   .enter()
-//   .append('text')
-//   .classed('place-label', true)
-//   .attr(
-//     'transform',
-//     (d: any) => `translate(${projection(d.geometry.coordinates)})`,
-//   )
-//   .attr('dy', '.35em')
-//   .attr('dx', '.5em')
-
-//   .text((d: any) => d.properties.name);

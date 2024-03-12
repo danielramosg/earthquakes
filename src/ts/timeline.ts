@@ -35,16 +35,16 @@ class Timeline implements Timeline {
     this.x = d3
       .scaleTime()
       .domain([startDate, endDate])
-      .range([0, width])
+      .range([0, width - 100])
       .nice();
 
     this.timeline = d3
       .select(parent)
       .append('svg')
-      .attr('width', this.width + 40)
+      .attr('width', this.width)
       .attr('height', this.height)
       .append('g')
-      .attr('transform', `translate(20,${this.height / 2})`);
+      .attr('transform', `translate(50,${this.height / 2})`);
 
     this.timeline.append('g').call(d3.axisBottom(this.x));
 
@@ -62,7 +62,8 @@ class Timeline implements Timeline {
       .join('circle')
       .attr('cx', this.x(time))
       .attr('cy', 0)
-      .attr('r', 5);
+      .attr('r', 5)
+      .style('fill', 'white');
 
     this.headerGroup
       .select('#mainDate')

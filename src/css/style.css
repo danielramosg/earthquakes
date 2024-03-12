@@ -1,33 +1,41 @@
-
+body {
+  color: white;
+  font-size: larger;
+}
 
 .sphere {
-    fill: none;
-    stroke: black;
+  fill: none;
+  stroke: black;
 }
 
 .land {
-    fill:bisque;
+  fill: bisque;
 }
 
 .city {
-    fill: rgb(246, 108, 108);
+  fill: rgb(246, 108, 108);
 }
 
 .place-label {
-font-family: sans-serif;
+  font-family: sans-serif;
 }
 
 .tectonic {
-    fill: none;
-    stroke: blue ;
-    stroke-width: 1px;
-    opacity: 0.5;
+  fill: none;
+  stroke: blue;
+  stroke-width: 1px;
+  opacity: 0.5;
 }
 
 #hist1 {
-    margin: 0.5em;
+  text-align: center;
 }
 
 .histBins {
-    fill: #69b3a2
+  fill: #69b3a2;
+}
+
+#gallery {
+  background-color: gray;
+  border-radius: 10px;
 }

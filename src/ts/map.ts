@@ -95,25 +95,30 @@ class Map implements Map {
     this.pathNot = d3.geoPath(this.projection, this.ctxNot);
 
     this.ctxNot.fillStyle = 'red';
-    this.pathNot.pointRadius(3);
+    this.pathNot.pointRadius(8);
   }
 
   drawBaseMap(
     land: GeoJSON.FeatureCollection,
     tectonic: GeoJSON.FeatureCollection,
   ) {
+    this.ctxBase.strokeStyle = 'white';
+    this.ctxBase.lineWidth = 2;
+    this.ctxBase.fillStyle = 'rgb(10,10,10)';
+
     this.ctxBase.beginPath();
+    this.pathBase({ type: 'Sphere' });
+    this.ctxBase.stroke();
+    this.ctxBase.fill();
+
+    this.ctxBase.beginPath();
+    this.ctxBase.fillStyle = 'grey';
     this.pathBase(land);
     this.ctxBase.fill();
 
     this.ctxBase.strokeStyle = 'blue';
     this.ctxBase.beginPath();
     this.pathBase(tectonic);
-    this.ctxBase.stroke();
-
-    this.ctxBase.strokeStyle = 'black';
-    this.ctxBase.beginPath();
-    this.pathBase({ type: 'Sphere' });
     this.ctxBase.stroke();
   }
 
@@ -160,7 +165,7 @@ class Map implements Map {
 
         if (d.properties.notable) {
           this.pathNot(d);
-          console.log(d.properties.place_en);
+          //   console.log(d.properties.place_en);
         }
       }
     });
