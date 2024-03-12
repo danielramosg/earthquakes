@@ -119,6 +119,8 @@ async function main() {
 
   map1.drawBaseMap(land, tectonic);
 
+  // gallery.setImages(earthquakes.features.filter((d) => d.properties.notable));
+
   let zero: number;
 
   const startAnimation = (time: number) => {
