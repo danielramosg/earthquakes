@@ -21,8 +21,8 @@ class Histogram implements Histogram {
     this.width = width;
     this.height = height;
     this.margin_top = 10;
-    this.margin_bottom = 30;
-    this.margin_left = 50;
+    this.margin_bottom = 50;
+    this.margin_left = 80;
     this.margin_right = 50;
     this.drawAreaWidth = this.width - this.margin_left - this.margin_right;
     this.drawAreaHeight = this.height - this.margin_top - this.margin_bottom;
@@ -36,15 +36,41 @@ class Histogram implements Histogram {
       .append('g')
       .attr('transform', `translate(${this.margin_left},${this.margin_top})`);
 
-    this.x = d3.scaleLinear().domain([6, 10]).range([0, this.drawAreaWidth]);
-    this.y = d3.scaleLinear().domain([0, 2500]).range([this.drawAreaHeight, 0]);
+    this.x = d3.scaleLinear().domain([6, 9.5]).range([0, this.drawAreaWidth]);
+    this.y = d3.scaleLinear().domain([0, 2000]).range([this.drawAreaHeight, 0]);
+
+    d3.formatDefaultLocale({
+      thousands: ' ',
+      decimal: ',',
+      grouping: [3],
+      currency: ['$', ''],
+    });
 
     this.hist
       .append('g')
       .attr('transform', `translate(0,${this.drawAreaHeight})`)
       .call(d3.axisBottom(this.x));
 
+    this.hist
+      .append('text')
+      .attr('class', 'x_label')
+      .attr('text-anchor', 'middle')
+      .attr('x', this.drawAreaWidth / 2)
+      .attr('y', this.drawAreaHeight + 45)
+      .attr('fill', 'currentColor')
+      .text('Magnitud');
+
     this.hist.append('g').call(d3.axisLeft(this.y));
+
+    this.hist
+      .append('text')
+      .attr('class', 'y_label')
+      .attr('text-anchor', 'middle')
+      .attr('x', -this.drawAreaHeight / 2)
+      .attr('y', -60)
+      .attr('fill', 'currentColor')
+      .attr('transform', 'rotate(-90)')
+      .text('Núm acumulat');
   }
 
   draw(data: GeoJSON.FeatureCollection) {
@@ -55,7 +81,7 @@ class Histogram implements Histogram {
     const bin = d3
       .bin()
       .domain(this.x.domain() as [number, number])
-      .thresholds(this.x.ticks(55))
+      .thresholds(this.x.ticks(45))
       .value((d) => d.properties.magnitude);
 
     const bins = bin(data.features);

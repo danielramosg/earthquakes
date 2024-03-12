@@ -35,6 +35,15 @@ body {
   fill: #69b3a2;
 }
 
+.x_label,
+.y_label {
+  font-size: medium;
+}
+
+.tick {
+  font-size: medium;
+}
+
 #gallery {
   background-color: gray;
   border-radius: 10px;
