@@ -17,9 +17,9 @@ d3.select('body')
   .classed('logos', true);
 
 const projection1 = geoMollweide().scale(160).rotate([-40, 0]);
-const projection2 = d3.geoOrthographic().scale(150);
-const vx = 0.01;
-const vy = -0.01;
+// const projection2 = d3.geoOrthographic().scale(150);
+// const vx = 0.01;
+// const vy = -0.01;
 
 // const projection = d3
 //   .geoConicConformal()
@@ -36,10 +36,9 @@ const vy = -0.01;
 
 const startTime = new Date(Date.UTC(1964, 0, 1)); // all dates and times in UTC
 const endTime = new Date(Date.UTC(2023, 11, 31));
-const deltaTime = 30 * 24 * 60 * 60 * 1000; // one day, in  milliseconds.
 
-const animationDuration = 30000; // 30 sec
-const animationEndTime = 40000;
+const animationDuration = 45000; // 45 sec
+const animationEndTime = 60000;
 
 const startTimeNum = startTime.getTime();
 const endTimeNum = endTime.getTime();
