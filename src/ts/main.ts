@@ -11,6 +11,11 @@ console.log(d3); // This is a fix
  * https://github.com/parcel-bundler/parcel/issues/8792
  * */
 
+d3.select('body')
+  .append('img')
+  .attr('src', new URL('../img/CRM-MdM-logo.png', import.meta.url).href)
+  .classed('logos', true);
+
 const projection1 = geoMollweide().scale(160).rotate([-40, 0]);
 const projection2 = d3.geoOrthographic().scale(150);
 const vx = 0.01;

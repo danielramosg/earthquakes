@@ -9,6 +9,13 @@ body {
   box-sizing: border-box;
 }
 
+.logos {
+  position: fixed;
+  top: 5px;
+  left: 5px;
+  height: 50;
+}
+
 #appContainer {
   width: 100vw;
   height: 100vh;
