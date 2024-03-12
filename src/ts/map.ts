@@ -148,22 +148,22 @@ class Map implements Map {
     this.ctxNot.beginPath();
 
     data.features.forEach((d) => {
-      const time = (timestamp - d.properties.timeStamp) / explosionDuration;
+      const time = (timestamp - d.properties?.timeStamp) / explosionDuration;
 
       if (time > 0 && time < 1) {
         this.pathExp.pointRadius(
-          easing(time) * magScale(Number(d.properties.magnitude)),
+          easing(time) * magScale(Number(d.properties?.magnitude)),
         );
         this.pathExp(d);
       }
 
       if (Math.abs(time) < 1e-2) {
         this.pathAccu.pointRadius(
-          magScale(Number(d.properties.magnitude)) * 0.3,
+          magScale(Number(d.properties?.magnitude)) * 0.3,
         );
         this.pathAccu(d);
 
-        if (d.properties.notable) {
+        if (d.properties?.notable) {
           this.pathNot(d);
           //   console.log(d.properties.place_en);
         }

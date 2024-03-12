@@ -58,7 +58,7 @@ class Histogram implements Histogram {
       .thresholds(this.x.ticks(55))
       .value((d) => d.properties.magnitude);
 
-    const bins = bin(data);
+    const bins = bin(data.features);
 
     this.hist
       .selectAll('.histBins')
@@ -82,10 +82,10 @@ class Histogram implements Histogram {
 
   drawTimestamp(timestamp: number, data: GeoJSON.FeatureCollection) {
     const useData = data.features.filter(
-      (d) => d.properties.timeStamp <= timestamp,
+      (d) => d.properties?.timeStamp <= timestamp,
     );
 
-    this.draw(useData);
+    this.draw({ type: 'FeatureCollection', features: useData });
   }
 }
 export { Histogram };

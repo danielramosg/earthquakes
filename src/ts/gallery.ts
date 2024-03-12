@@ -14,7 +14,9 @@ interface Gallery {
   height: number;
   x: any;
   y: any;
-  setImages(time: Date, data: GeoJSON.FeatureCollection): void;
+  setImages(data: GeoJSON.FeatureCollection): void;
+  setImagesTimestamp(timestamp: number, data: GeoJSON.FeatureCollection): void;
+  clearImages(): void;
 }
 
 class Gallery implements Gallery {
@@ -27,36 +29,42 @@ class Gallery implements Gallery {
   setImages(data: GeoJSON.FeatureCollection): void {
     const galleryItem = this.gallery
       .selectAll('.galleryItem')
-      .data(data)
+      .data(data.features)
       .enter()
       .append('div')
       .classed('galleryItem', true);
 
     galleryItem
       .append('img')
-      .attr('src', (d) => imgAssets[`IMG_${d.properties.photo.split('.')[0]}`]);
+      .attr(
+        'src',
+        (d) =>
+          imgAssets[
+            `IMG_${d.properties?.photo.split('.')[0]}` as keyof typeof imgAssets
+          ],
+      );
 
     galleryItem
       .append('div')
       .classed('credits', true)
-      .text((d) => `Foto: ${d.properties.photo_source}`);
+      .text((d) => `Foto: ${d.properties?.photo_source}`);
 
     galleryItem
       .append('div')
       .classed('caption', true)
       .text(
         (d) =>
-          `${d.properties.place_ca}, ${dateFormatter.format(
-            d.properties.date,
+          `${d.properties?.place_ca}, ${dateFormatter.format(
+            d.properties?.date,
           )}`,
       );
   }
 
   setImagesTimestamp(timestamp: number, data: GeoJSON.FeatureCollection) {
     const filteredData = data.features.filter(
-      (d) => d.properties.notable && d.properties.timeStamp < timestamp,
+      (d) => d.properties?.notable && d.properties?.timeStamp < timestamp,
     );
-    this.setImages(filteredData);
+    this.setImages({ type: 'FeatureCollection', features: filteredData });
   }
 
   clearImages() {

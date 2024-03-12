@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { Map } from './map';
-import { Histogram, makeHistogram } from './histogram';
+import { Histogram } from './histogram';
 import { geoMollweide } from 'd3-geo-projection';
 import { Timeline } from './timeline';
 import { Gallery } from './gallery';
@@ -10,6 +10,15 @@ console.log(d3); // This is a fix
  * Import is somewhat broken in Parcel
  * https://github.com/parcel-bundler/parcel/issues/8792
  * */
+
+declare global {
+  interface Window {
+    earthquakes: GeoJSON.FeatureCollection;
+    d3: typeof d3;
+  }
+}
+
+window.d3 = d3;
 
 d3.select('body')
   .append('img')
@@ -72,15 +81,15 @@ async function main() {
   const list = earthquakes.features.forEach((d) => {
     const newDate = new Date(
       Date.UTC(
-        d.properties.year,
-        (Number(d.properties.month) - 1).toString(),
-        d.properties.day,
-        d.properties.hour,
-        d.properties.minute,
-        d.properties.second,
+        Number(d.properties?.year),
+        Number(d.properties?.month) - 1,
+        Number(d.properties?.day),
+        Number(d.properties?.hour),
+        Number(d.properties?.minute),
+        Number(d.properties?.second),
         Math.floor(
-          (Number(d.properties.second) -
-            Math.floor(Number(d.properties.second))) *
+          (Number(d.properties?.second) -
+            Math.floor(Number(d.properties?.second))) *
             1000,
         ),
       ),
